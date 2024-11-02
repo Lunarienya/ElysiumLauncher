@@ -507,7 +507,7 @@ jobs:
         run: |
           cmake --install ${{ env.BUILD_DIR }} --prefix ${{ env.INSTALL_APPIMAGE_DIR }}/usr
 
-          mv ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunaislazier.ElysiumLauncher.metainfo.xml ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunaislazier.ElysiumLauncher.appdata.xml
+          mv ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunarie.ElysiumLauncher.metainfo.xml ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunarie.ElysiumLauncher.appdata.xml
           export "NO_APPSTREAM=1" # we have to skip appstream checking because appstream on ubuntu 20.04 is outdated
 
           export OUTPUT="ElysiumLauncher-Linux-x86_64.AppImage"
@@ -541,7 +541,7 @@ jobs:
             echo ":warning: Skipped code signing for Linux AppImage, as gpg key was not present." >> $GITHUB_STEP_SUMMARY
           fi
 
-          ./linuxdeploy-x86_64.AppImage --appdir ${{ env.INSTALL_APPIMAGE_DIR }} --output appimage --plugin qt -i ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/icons/hicolor/scalable/apps/org.lunaislazier.ElysiumLauncher.svg
+          ./linuxdeploy-x86_64.AppImage --appdir ${{ env.INSTALL_APPIMAGE_DIR }} --output appimage --plugin qt -i ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/icons/hicolor/scalable/apps/org.lunarie.ElysiumLauncher.svg
 
           mv "ElysiumLauncher-Linux-x86_64.AppImage" "ElysiumLauncher-Linux-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage"
 
@@ -646,7 +646,7 @@ jobs:
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: "Elysium Launcher.flatpak"
-          manifest-path: flatpak/org.lunaislazier.ElysiumLauncher.yml
+          manifest-path: flatpak/org.lunarie.ElysiumLauncher.yml
 
   nix:
     name: Nix (${{ matrix.system }})
