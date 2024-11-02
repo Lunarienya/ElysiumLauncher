@@ -1,27 +1,26 @@
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/program_info/shatteredprism-header.svg">
-  <source media="(prefers-color-scheme: light)" srcset="/program_info/shatteredprism-header.svg">
-  <img alt="ShatteredPrism" src="/program_info/shatteredprism-header.svg" width="40%">
+  <source media="(prefers-color-scheme: dark)" srcset="/program_info/elysiumlauncher-header.svg">
+  <source media="(prefers-color-scheme: light)" srcset="/program_info/elysiumlauncher-header.svg">
+  <img alt="Elysiumlauncher" src="/program_info/elysiumlauncher-header.svg" width="40%">
 </picture>
 </p>
 
 <p align="center">
-  Shattered Prism is a custom launcher for Minecraft that allows you to easily manage multiple installations of Minecraft at once.<br />
+  Elysium Launcher is a custom launcher for Minecraft that allows you to easily manage multiple installations of Minecraft at once.<br />
   <br />This is a <b>fork</b> of PrismLauncher and is <b>not</b> endorsed by it.
 </p>
 
 # Why does this exist?
 
 - Fully removed PrismLauncher's DRM.
-- Restores the ability to download modpacks from FTB.
-- [Support for alternative auth servers](doc/alternative-auth-servers.md).
-
+- ~~Restores the ability to download modpacks from FTB.~~
+- Explicit support for Elysium, Lunarie's auth server.
 
 ## Installation
 
-- Downloads can be found on the [GitHub Releases](https://github.com/LunaisLazier/ShatteredPrism/releases).
-- Last build status can be found in the [GitHub Actions](https://github.com/LunaisLazier/ShatteredPrism/actions) tab (this also includes the pull requests status).
+- Downloads can be found on the [GitHub Releases](https://github.com/Lunarienya/ElysiumLauncher/releases).
+- Last build status can be found in the [GitHub Actions](https://github.com/Lunarienya/ElysiumLauncher/actions) tab (this also includes the pull requests status).
 
 ## Community & Support
 

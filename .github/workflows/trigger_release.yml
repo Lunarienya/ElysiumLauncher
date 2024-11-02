@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: "true"
-          path: "ShatteredPrism-source"
+          path: "ElysiumLauncher-source"
       - name: Download artifacts
         uses: actions/download-artifact@v4
       - name: Grab and store version
@@ -46,38 +46,38 @@ jobs:
           echo "VERSION=$tag_name" >> $GITHUB_ENV
       - name: Package artifacts properly
         run: |
-          mv ${{ github.workspace }}/ShatteredPrism-source ShatteredPrism-${{ env.VERSION }}
-          mv ShatteredPrism-Linux-Qt6-Portable*/ShatteredPrism-portable.tar.gz ShatteredPrism-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
-          mv ShatteredPrism-Linux-Qt5-Portable*/ShatteredPrism-portable.tar.gz ShatteredPrism-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
-          mv ShatteredPrism-*.AppImage/ShatteredPrism-*.AppImage ShatteredPrism-Linux-x86_64.AppImage
-          mv ShatteredPrism-*.AppImage.zsync/ShatteredPrism-*.AppImage.zsync ShatteredPrism-Linux-x86_64.AppImage.zsync
-          mv ShatteredPrism-macOS-Legacy*/ShatteredPrism.zip ShatteredPrism-macOS-Legacy-${{ env.VERSION }}.zip
-          mv ShatteredPrism-macOS*/ShatteredPrism.zip ShatteredPrism-macOS-${{ env.VERSION }}.zip
+          mv ${{ github.workspace }}/ElysiumLauncher-source ElysiumLauncher-${{ env.VERSION }}
+          mv ElysiumLauncher-Linux-Qt6-Portable*/ElysiumLauncher-portable.tar.gz ElysiumLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
+          mv ElysiumLauncher-Linux-Qt5-Portable*/ElysiumLauncher-portable.tar.gz ElysiumLauncher-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
+          mv ElysiumLauncher-*.AppImage/ElysiumLauncher-*.AppImage ElysiumLauncher-Linux-x86_64.AppImage
+          mv ElysiumLauncher-*.AppImage.zsync/ElysiumLauncher-*.AppImage.zsync ElysiumLauncher-Linux-x86_64.AppImage.zsync
+          mv ElysiumLauncher-macOS-Legacy*/ElysiumLauncher.zip ElysiumLauncher-macOS-Legacy-${{ env.VERSION }}.zip
+          mv ElysiumLauncher-macOS*/ElysiumLauncher.zip ElysiumLauncher-macOS-${{ env.VERSION }}.zip
 
-          tar --exclude='.git' -czf ShatteredPrism-${{ env.VERSION }}.tar.gz ShatteredPrism-${{ env.VERSION }}
+          tar --exclude='.git' -czf ElysiumLauncher-${{ env.VERSION }}.tar.gz ElysiumLauncher-${{ env.VERSION }}
 
-          for d in ShatteredPrism-Windows-MSVC*; do
+          for d in ElysiumLauncher-Windows-MSVC*; do
             cd "${d}" || continue
             LEGACY="$(echo -n ${d} | grep -o Legacy || true)"
             ARM64="$(echo -n ${d} | grep -o arm64 || true)"
             INST="$(echo -n ${d} | grep -o Setup || true)"
             PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="ShatteredPrism-Windows-MSVC"
+            NAME="ElysiumLauncher-Windows-MSVC"
             test -z "${LEGACY}" || NAME="${NAME}-Legacy"
             test -z "${ARM64}" || NAME="${NAME}-arm64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv ShatteredPrism-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -z "${INST}" || mv ElysiumLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
             test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
             cd ..
           done
 
-          for d in ShatteredPrism-Windows-MinGW-w64*; do
+          for d in ElysiumLauncher-Windows-MinGW-w64*; do
             cd "${d}" || continue
             INST="$(echo -n ${d} | grep -o Setup || true)"
             PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="ShatteredPrism-Windows-MinGW-w64"
+            NAME="ElysiumLauncher-Windows-MinGW-w64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv ShatteredPrism-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -z "${INST}" || mv ElysiumLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
             test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
             cd ..
           done
@@ -88,23 +88,23 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ github.ref }}
-          name: Shattered Prism ${{ env.VERSION }}
+          name: Elysium Launcher ${{ env.VERSION }}
           draft: true
           prerelease: false
           files: |
-            ShatteredPrism-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
-            ShatteredPrism-Linux-x86_64.AppImage
-            ShatteredPrism-Linux-x86_64.AppImage.zsync
-            ShatteredPrism-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
-            ShatteredPrism-Windows-MinGW-w64-${{ env.VERSION }}.zip
-            ShatteredPrism-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip
-            ShatteredPrism-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe
-            ShatteredPrism-Windows-MSVC-arm64-${{ env.VERSION }}.zip
-            ShatteredPrism-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip
-            ShatteredPrism-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe
-            ShatteredPrism-Windows-MSVC-${{ env.VERSION }}.zip
-            ShatteredPrism-Windows-MSVC-Portable-${{ env.VERSION }}.zip
-            ShatteredPrism-Windows-MSVC-Setup-${{ env.VERSION }}.exe
-            ShatteredPrism-macOS-${{ env.VERSION }}.zip
-            ShatteredPrism-macOS-Legacy-${{ env.VERSION }}.zip
-            ShatteredPrism-${{ env.VERSION }}.tar.gz
+            ElysiumLauncher-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
+            ElysiumLauncher-Linux-x86_64.AppImage
+            ElysiumLauncher-Linux-x86_64.AppImage.zsync
+            ElysiumLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
+            ElysiumLauncher-Windows-MinGW-w64-${{ env.VERSION }}.zip
+            ElysiumLauncher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip
+            ElysiumLauncher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe
+            ElysiumLauncher-Windows-MSVC-arm64-${{ env.VERSION }}.zip
+            ElysiumLauncher-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip
+            ElysiumLauncher-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe
+            ElysiumLauncher-Windows-MSVC-${{ env.VERSION }}.zip
+            ElysiumLauncher-Windows-MSVC-Portable-${{ env.VERSION }}.zip
+            ElysiumLauncher-Windows-MSVC-Setup-${{ env.VERSION }}.exe
+            ElysiumLauncher-macOS-${{ env.VERSION }}.zip
+            ElysiumLauncher-macOS-Legacy-${{ env.VERSION }}.zip
+            ElysiumLauncher-${{ env.VERSION }}.tar.gz

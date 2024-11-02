@@ -376,7 +376,7 @@ jobs:
           cmake --install ${{ env.BUILD_DIR }}
 
           cd ${{ env.INSTALL_DIR }}
-          chmod +x "ShatteredPrism.app/Contents/MacOS/ShatteredPrism"
+          chmod +x "ElysiumLauncher.app/Contents/MacOS/ElysiumLauncher"
 
           if [ -n '${{ secrets.APPLE_CODESIGN_ID }}' ]; then
             APPLE_CODESIGN_ID='${{ secrets.APPLE_CODESIGN_ID }}'
@@ -384,8 +384,8 @@ jobs:
             APPLE_CODESIGN_ID='-'
           fi
 
-          sudo codesign --sign "$APPLE_CODESIGN_ID" --deep --force --entitlements "../program_info/App.entitlements" --options runtime "ShatteredPrism.app/Contents/MacOS/ShatteredPrism"
-          mv "ShatteredPrism.app" "Shattered Prism.app"
+          sudo codesign --sign "$APPLE_CODESIGN_ID" --deep --force --entitlements "../program_info/App.entitlements" --options runtime "ElysiumLauncher.app/Contents/MacOS/ElysiumLauncher"
+          mv "ElysiumLauncher.app" "Elysium Launcher.app"
 
       - name: Notarize (macOS)
         if: runner.os == 'macOS'
@@ -393,25 +393,25 @@ jobs:
           cd ${{ env.INSTALL_DIR }}
 
           if [ -n '${{ secrets.APPLE_NOTARIZE_PASSWORD }}' ]; then
-            ditto -c -k --sequesterRsrc --keepParent "Shattered Prism.app" ../ShatteredPrism.zip
-            xcrun notarytool submit ../ShatteredPrism.zip \
+            ditto -c -k --sequesterRsrc --keepParent "Elysium Launcher.app" ../ElysiumLauncher.zip
+            xcrun notarytool submit ../ElysiumLauncher.zip \
               --wait --progress \
               --apple-id '${{ secrets.APPLE_NOTARIZE_APPLE_ID }}' \
               --team-id '${{ secrets.APPLE_NOTARIZE_TEAM_ID }}' \
               --password '${{ secrets.APPLE_NOTARIZE_PASSWORD }}'
 
-            xcrun stapler staple "Shattered Prism.app"
+            xcrun stapler staple "Elysium Launcher.app"
           else
             echo ":warning: Skipping notarization as credentials are not present." >> $GITHUB_STEP_SUMMARY
           fi
-          ditto -c -k --sequesterRsrc --keepParent "Shattered Prism.app" ../ShatteredPrism.zip
+          ditto -c -k --sequesterRsrc --keepParent "Elysium Launcher.app" ../ElysiumLauncher.zip
 
       - name: Make Sparkle signature (macOS)
         if: matrix.name == 'macOS'
         run: |
           if [ '${{ secrets.SPARKLE_ED25519_KEY }}' != '' ]; then
             echo '${{ secrets.SPARKLE_ED25519_KEY }}' > ed25519-priv.pem
-            signature=$(/opt/homebrew/opt/openssl@3/bin/openssl pkeyutl -sign -rawin -in ${{ github.workspace }}/ShatteredPrism.zip -inkey ed25519-priv.pem | openssl base64 | tr -d \\n)
+            signature=$(/opt/homebrew/opt/openssl@3/bin/openssl pkeyutl -sign -rawin -in ${{ github.workspace }}/ElysiumLauncher.zip -inkey ed25519-priv.pem | openssl base64 | tr -d \\n)
             rm ed25519-priv.pem
             cat >> $GITHUB_STEP_SUMMARY << EOF
           ### Artifact Information :information_source:
@@ -453,7 +453,7 @@ jobs:
           if (Get-Content ./codesign.pfx){
             cd ${{ env.INSTALL_DIR }}
             # We ship the exact same executable for portable and non-portable editions, so signing just once is fine
-           SignTool sign /fd sha256 /td sha256 /f ../codesign.pfx /p '${{ secrets.WINDOWS_CODESIGN_PASSWORD }}' /tr http://timestamp.digicert.com ShatteredPrism.exe ShatteredPrism_updater.exe ShatteredPrism_filelink.exe
+           SignTool sign /fd sha256 /td sha256 /f ../codesign.pfx /p '${{ secrets.WINDOWS_CODESIGN_PASSWORD }}' /tr http://timestamp.digicert.com ElysiumLauncher.exe ElysiumLauncher_updater.exe ElysiumLauncher_filelink.exe
           } else {
             ":warning: Skipped code signing for Windows, as certificate was not present." >> $env:GITHUB_STEP_SUMMARY
           }
@@ -494,7 +494,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           if (Get-Content ./codesign.pfx){
-            SignTool sign /fd sha256 /td sha256 /f codesign.pfx /p '${{ secrets.WINDOWS_CODESIGN_PASSWORD }}' /tr http://timestamp.digicert.com ShatteredPrism-Setup.exe
+            SignTool sign /fd sha256 /td sha256 /f codesign.pfx /p '${{ secrets.WINDOWS_CODESIGN_PASSWORD }}' /tr http://timestamp.digicert.com ElysiumLauncher-Setup.exe
           } else {
             ":warning: Skipped code signing for Windows, as certificate was not present." >> $env:GITHUB_STEP_SUMMARY
           }
@@ -507,10 +507,10 @@ jobs:
         run: |
           cmake --install ${{ env.BUILD_DIR }} --prefix ${{ env.INSTALL_APPIMAGE_DIR }}/usr
 
-          mv ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunaislazier.ShatteredPrism.metainfo.xml ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunaislazier.ShatteredPrism.appdata.xml
+          mv ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunaislazier.ElysiumLauncher.metainfo.xml ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/metainfo/org.lunaislazier.ElysiumLauncher.appdata.xml
           export "NO_APPSTREAM=1" # we have to skip appstream checking because appstream on ubuntu 20.04 is outdated
 
-          export OUTPUT="ShatteredPrism-Linux-x86_64.AppImage"
+          export OUTPUT="ElysiumLauncher-Linux-x86_64.AppImage"
 
           chmod +x linuxdeploy-*.AppImage
 
@@ -529,7 +529,7 @@ jobs:
           chmod +x AppImageUpdate-x86_64.AppImage
           cp AppImageUpdate-x86_64.AppImage ${{ env.INSTALL_APPIMAGE_DIR }}/usr/bin
 
-          export UPDATE_INFORMATION="gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|ShatteredPrism-Linux-x86_64.AppImage.zsync" 
+          export UPDATE_INFORMATION="gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|ElysiumLauncher-Linux-x86_64.AppImage.zsync" 
 
           if [ '${{ secrets.GPG_PRIVATE_KEY_ID }}' != '' ]; then
             export SIGN=1
@@ -541,9 +541,9 @@ jobs:
             echo ":warning: Skipped code signing for Linux AppImage, as gpg key was not present." >> $GITHUB_STEP_SUMMARY
           fi
 
-          ./linuxdeploy-x86_64.AppImage --appdir ${{ env.INSTALL_APPIMAGE_DIR }} --output appimage --plugin qt -i ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/icons/hicolor/scalable/apps/org.lunaislazier.ShatteredPrism.svg
+          ./linuxdeploy-x86_64.AppImage --appdir ${{ env.INSTALL_APPIMAGE_DIR }} --output appimage --plugin qt -i ${{ env.INSTALL_APPIMAGE_DIR }}/usr/share/icons/hicolor/scalable/apps/org.lunaislazier.ElysiumLauncher.svg
 
-          mv "ShatteredPrism-Linux-x86_64.AppImage" "ShatteredPrism-Linux-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage"
+          mv "ElysiumLauncher-Linux-x86_64.AppImage" "ElysiumLauncher-Linux-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage"
 
       - name: Package (Linux, portable)
         if: runner.os == 'Linux'
@@ -562,7 +562,7 @@ jobs:
 
           for l in $(find ${{ env.INSTALL_PORTABLE_DIR }} -type f); do l=${l#$(pwd)/}; l=${l#${{ env.INSTALL_PORTABLE_DIR }}/}; l=${l#./}; echo $l; done > ${{ env.INSTALL_PORTABLE_DIR }}/manifest.txt
           cd ${{ env.INSTALL_PORTABLE_DIR }}
-          tar -czf ../ShatteredPrism-portable.tar.gz *
+          tar -czf ../ElysiumLauncher-portable.tar.gz *
 
       ##
       # UPLOAD BUILDS
@@ -572,57 +572,57 @@ jobs:
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ matrix.name }}-${{ env.VERSION }}-${{ inputs.build_type }}
-          path: ShatteredPrism.zip
+          name: ElysiumLauncher-${{ matrix.name }}-${{ env.VERSION }}-${{ inputs.build_type }}
+          path: ElysiumLauncher.zip
 
       - name: Upload binary zip (Windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ matrix.name }}-${{ env.VERSION }}-${{ inputs.build_type }}
+          name: ElysiumLauncher-${{ matrix.name }}-${{ env.VERSION }}-${{ inputs.build_type }}
           path: ${{ env.INSTALL_DIR }}/**
 
       - name: Upload binary zip (Windows, portable)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ matrix.name }}-Portable-${{ env.VERSION }}-${{ inputs.build_type }}
+          name: ElysiumLauncher-${{ matrix.name }}-Portable-${{ env.VERSION }}-${{ inputs.build_type }}
           path: ${{ env.INSTALL_PORTABLE_DIR }}/**
 
       - name: Upload installer (Windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ matrix.name }}-Setup-${{ env.VERSION }}-${{ inputs.build_type }}
-          path: ShatteredPrism-Setup.exe
+          name: ElysiumLauncher-${{ matrix.name }}-Setup-${{ env.VERSION }}-${{ inputs.build_type }}
+          path: ElysiumLauncher-Setup.exe
 
       - name: Upload binary tarball (Linux, portable, Qt 5)
         if: runner.os == 'Linux' && matrix.qt_ver != 6
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ runner.os }}-Qt5-Portable-${{ env.VERSION }}-${{ inputs.build_type }}
-          path: ShatteredPrism-portable.tar.gz
+          name: ElysiumLauncher-${{ runner.os }}-Qt5-Portable-${{ env.VERSION }}-${{ inputs.build_type }}
+          path: ElysiumLauncher-portable.tar.gz
 
       - name: Upload binary tarball (Linux, portable, Qt 6)
         if: runner.os == 'Linux' && matrix.qt_ver != 5
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ runner.os }}-Qt6-Portable-${{ env.VERSION }}-${{ inputs.build_type }}
-          path: ShatteredPrism-portable.tar.gz
+          name: ElysiumLauncher-${{ runner.os }}-Qt6-Portable-${{ env.VERSION }}-${{ inputs.build_type }}
+          path: ElysiumLauncher-portable.tar.gz
 
       - name: Upload AppImage (Linux)
         if: runner.os == 'Linux' && matrix.qt_ver != 5
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ runner.os }}-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage
-          path: ShatteredPrism-${{ runner.os }}-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage
+          name: ElysiumLauncher-${{ runner.os }}-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage
+          path: ElysiumLauncher-${{ runner.os }}-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage
 
       - name: Upload AppImage Zsync (Linux)
         if: runner.os == 'Linux' && matrix.qt_ver != 5
         uses: actions/upload-artifact@v4
         with:
-          name: ShatteredPrism-${{ runner.os }}-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage.zsync
-          path: ShatteredPrism-Linux-x86_64.AppImage.zsync
+          name: ElysiumLauncher-${{ runner.os }}-${{ env.VERSION }}-${{ inputs.build_type }}-x86_64.AppImage.zsync
+          path: ElysiumLauncher-Linux-x86_64.AppImage.zsync
 
       - name: ccache stats (Windows MinGW-w64)
         if: runner.os == 'Windows' && matrix.msystem != ''
@@ -645,8 +645,8 @@ jobs:
         if: inputs.build_type == 'Debug'
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: "Shattered Prism.flatpak"
-          manifest-path: flatpak/org.lunaislazier.ShatteredPrism.yml
+          bundle: "Elysium Launcher.flatpak"
+          manifest-path: flatpak/org.lunaislazier.ElysiumLauncher.yml
 
   nix:
     name: Nix (${{ matrix.system }})
@@ -691,9 +691,9 @@ jobs:
       - name: Build debug package
         if: ${{ inputs.build_type == 'Debug' }}
         run: |
-          nix build --print-build-logs .#shatteredprism-debug
+          nix build --print-build-logs .#elysiumlauncher-debug
 
       - name: Build release package
         if: ${{ inputs.build_type != 'Debug' }}
         run: |
-          nix build --print-build-logs .#shatteredprism
+          nix build --print-build-logs .#elysiumlauncher

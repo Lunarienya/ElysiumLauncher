@@ -83,7 +83,7 @@ void AuthlibInjectorLoginDialog::dropEvent(QDropEvent* event)
 {
     const auto& url = extractAuthlibInjectorUrl(event->mimeData());
     if (url.isValid()) {
-        ui->authlibInjectorTextBox->setText(url.toString());
+        //ui->authlibInjectorTextBox->setText(url.toString());
     }
     event->acceptProposedAction();
 }
@@ -92,8 +92,9 @@ void AuthlibInjectorLoginDialog::dropEvent(QDropEvent* event)
 void AuthlibInjectorLoginDialog::accept()
 {
     ui->errorMessage->setVisible(false);
-    auto fixedAuthlibInjectorUrl = AuthlibInjectorLoginDialog::fixUrl(ui->authlibInjectorTextBox->text());
+    auto fixedAuthlibInjectorUrl = AuthlibInjectorLoginDialog::fixUrl("https://elysium.lunarie.party/authlib-injector");
 
+/*
     auto response = CustomMessageBox::selectable(this, QObject::tr("Confirm account creation"),
                                                  QObject::tr("Warning: you are about to send the username and password you entered to an "
                                                              "unofficial, third-party authentication server:\n"
@@ -105,6 +106,7 @@ void AuthlibInjectorLoginDialog::accept()
                         ->exec();
     if (response != QMessageBox::Yes)
         return;
+*/
 
     setUserInputsEnabled(false);
     ui->loadingLabel->setVisible(true);
@@ -128,7 +130,7 @@ void AuthlibInjectorLoginDialog::setUserInputsEnabled(bool enable)
 {
     ui->userTextBox->setEnabled(enable);
     ui->passTextBox->setEnabled(enable);
-    ui->authlibInjectorTextBox->setEnabled(enable);
+    //ui->authlibInjectorTextBox->setEnabled(enable);
     ui->buttonBox->setEnabled(enable);
 }
 
@@ -136,17 +138,17 @@ void AuthlibInjectorLoginDialog::setUserInputsEnabled(bool enable)
 void AuthlibInjectorLoginDialog::on_userTextBox_textEdited(const QString& newText)
 {
     ui->buttonBox->button(QDialogButtonBox::Ok)
-        ->setEnabled(!newText.isEmpty() && !ui->passTextBox->text().isEmpty() && !ui->authlibInjectorTextBox->text().isEmpty());
+        ->setEnabled(!newText.isEmpty() && !ui->passTextBox->text().isEmpty());
 }
 void AuthlibInjectorLoginDialog::on_passTextBox_textEdited(const QString& newText)
 {
     ui->buttonBox->button(QDialogButtonBox::Ok)
-        ->setEnabled(!newText.isEmpty() && !ui->passTextBox->text().isEmpty() && !ui->authlibInjectorTextBox->text().isEmpty());
+        ->setEnabled(!newText.isEmpty() && !ui->passTextBox->text().isEmpty());
 }
 void AuthlibInjectorLoginDialog::on_authlibInjectorTextBox_textEdited(const QString& newText)
 {
     ui->buttonBox->button(QDialogButtonBox::Ok)
-        ->setEnabled(!newText.isEmpty() && !ui->passTextBox->text().isEmpty() && !ui->authlibInjectorTextBox->text().isEmpty());
+        ->setEnabled(!newText.isEmpty() && !ui->passTextBox->text().isEmpty());
 }
 
 void AuthlibInjectorLoginDialog::onApiLocationTaskFailed(const QString& reason)

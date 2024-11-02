@@ -58,7 +58,7 @@ AccountListPage::AccountListPage(QWidget* parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     ui->listView->setEmptyString(
         tr("Welcome!\n"
-           "If you're new here, you can select the \"Add Microsoft\" button to link your Microsoft account."));
+           "If you're new here, you can select the \"Add Elysium\" button to link your Elysium account."));
     ui->listView->setEmptyMode(VersionListView::String);
     ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -136,12 +136,8 @@ void AccountListPage::on_actionAddAuthlibInjector_triggered()
 {
 
     MinecraftAccountPtr account = AuthlibInjectorLoginDialog::newAccount(
-        this, tr("Please enter your username (sometimes an email address), password, and the URL of your API server."
-                 "<br>"
-                 "See <a href=\"https://github.com/unmojang/FjordLauncher/blob/develop/doc/alternative-auth-servers.md\">this page</a> in "
-                 "the Fjord Launcher repository for a list of common API servers."
-                 "<br><br>"
-                 "<b>Caution!</b> Your username and password will be sent to the authentication server you specify!"));
+        this, tr("Please enter the username and password you've used to register on the Elysium website."
+                 ""));
 
     if (account) {
         m_accounts->addAccount(account);

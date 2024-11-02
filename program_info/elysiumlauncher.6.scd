@@ -1,27 +1,27 @@
-shatteredprism(6)
+elysiumlauncher(6)
 
 
 # NAME
 
-shatteredprism - a launcher and instance manager for Minecraft.
+elysiumlauncher - a launcher and instance manager for Minecraft.
 
 
 # SYNOPSIS
 
-*shatteredprism* [OPTIONS...]
+*elysiumlauncher* [OPTIONS...]
 
 
 # DESCRIPTION
 
-Shattered Prism is a custom launcher for Minecraft that allows you to easily manage
+Elysium Launcher is a custom launcher for Minecraft that allows you to easily manage
 multiple installations of Minecraft at once. It also allows you to easily
 install and remove mods by simply dragging and dropping.
-Here are the current features of Shattered Prism.
+Here are the current features of Elysium Launcher.
 
 # OPTIONS
 
 *-d, --dir*=DIRECTORY
-	Use DIRECTORY as the Shattered Prism root.
+	Use DIRECTORY as the Elysium Launcher root.
 
 *-l, --launch*=INSTANCE_ID
 	Launch the instance specified by INSTANCE_ID.
@@ -30,7 +30,7 @@ Here are the current features of Shattered Prism.
 	Show the configuration window of the instance specified by INSTANCE_ID.
 
 *--alive*
-	Write a small 'live.check' file after Shattered Prism starts.
+	Write a small 'live.check' file after Elysium Launcher starts.
 
 *-h, --help*
 	Display help text and exit.
@@ -69,11 +69,11 @@ variables, besides other common Qt variables:
 
 # BUGS
 
-https://github.com/lunaislazier/ShatteredPrism/issues
+https://github.com/Lunarienya/ElysiumLauncher/issues
 
 # RESOURCES
 
-GitHub: https://github.com/lunaislazier/ShatteredPrism
+GitHub: https://github.com/Lunarienya/ElysiumLauncher
 
 # AUTHORS
 
@@ -87,4 +87,6 @@ Prism Launcher Contributors
 
 Fjord Launcher Contributors
 
-Shattered Prism Contributors
+Elysium Launcher Contributors
+
+Elysium Launcher Contributors

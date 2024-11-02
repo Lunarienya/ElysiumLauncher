@@ -3,8 +3,8 @@
 #endif
 #include <windows.h>
 
-IDI_ICON1               ICON    DISCARDABLE     "shatteredprism.ico"
-1 RT_MANIFEST "shatteredprism.manifest"
+IDI_ICON1               ICON    DISCARDABLE     "elysiumlauncher.ico"
+1 RT_MANIFEST "elysiumlauncher.manifest"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     @Launcher_VERSION_NAME4_COMMA@
@@ -15,10 +15,10 @@ BEGIN
         BEGIN
                 BLOCK "000004b0"
                 BEGIN
-                        VALUE "CompanyName", "MultiMC & Prism Launcher & Fjord Launcher & Shattered Prism Contributors"
-                        VALUE "FileDescription", "Shattered Prism"
+                        VALUE "CompanyName", "MultiMC & Prism Launcher & Fjord Launcher & Shattered Prism Contributors & Elysium Launcher Contributors"
+                        VALUE "FileDescription", "Elysium Launcher"
                         VALUE "FileVersion", "@Launcher_VERSION_NAME4@"
-                        VALUE "ProductName", "Shattered Prism"
+                        VALUE "ProductName", "Elysium Launcher"
                         VALUE "ProductVersion", "@Launcher_VERSION_NAME4@"
                 END
         END

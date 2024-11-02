@@ -52,8 +52,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAddMicrosoft"/>
    <addaction name="actionAddAuthlibInjector"/>
+   <addaction name="actionAddMicrosoft"/>
    <addaction name="actionAddOffline"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionRemove"/>
@@ -83,19 +83,14 @@
     <string>Manage Skins</string>
    </property>
   </action>
+  <action name="actionAddAuthlibInjector">
+   <property name="text">
+    <string>Add Elysium</string>
+   </property>
+  </action>
   <action name="actionAddMicrosoft">
    <property name="text">
     <string>&amp;Add Microsoft</string>
-   </property>
-  </action>
-  <action name="actionAddAuthlibInjector">
-   <property name="text">
-    <string>Add authlib-&amp;injector</string>
-   </property>
-  </action>
-  <action name="actionAddOffline">
-   <property name="text">
-    <string>Add &amp;Offline</string>
    </property>
   </action>
   <action name="actionRefresh">

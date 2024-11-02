@@ -53,13 +53,6 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QLineEdit" name="authlibInjectorTextBox">
-     <property name="placeholderText">
-       <string>https://example.com/authlib-injector</string>
-     </property>
-    </widget>
-   </item>
     <item>
     <widget class="QLabel" name="loadingLabel">
       <property name="font">

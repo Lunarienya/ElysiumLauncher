@@ -1,5 +1,5 @@
 {
-  description = "Prism Launcher fork with support for alternative auth servers";
+  description = "Prism Launcher fork for the Elysium auth server";
 
   nixConfig = {
     extra-substituters = [ "https://unmojang.cachix.org" ];
@@ -23,8 +23,8 @@
 
       ```
       {
-        inputs.shatteredprism = {
-          url = "github:lunaislazier/ShatteredPrism";
+        inputs.elysiumlauncher = {
+          url = "github:Lunarienya/ElysiumLauncher";
           inputs = {
             flake-compat.follows = "";
           };
@@ -74,7 +74,7 @@
         in
         {
           default = pkgs.mkShell {
-            inputsFrom = [ self.packages.${system}.shatteredprism-unwrapped ];
+            inputsFrom = [ self.packages.${system}.elysiumlauncher-unwrapped ];
             buildInputs = with pkgs; [
               ccache
               ninja
@@ -91,7 +91,7 @@
           version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
         in
         {
-          shatteredprism-unwrapped = prev.callPackage ./nix/unwrapped.nix {
+          elysiumlauncher-unwrapped = prev.callPackage ./nix/unwrapped.nix {
             inherit
               libnbtplusplus
               nix-filter
@@ -100,7 +100,7 @@
               ;
           };
 
-          shatteredprism = final.callPackage ./nix/wrapper.nix { };
+          elysiumlauncher = final.callPackage ./nix/wrapper.nix { };
         };
 
       packages = forAllSystems (
@@ -113,8 +113,8 @@
 
           # Grab our packages from it and set the default
           packages = {
-            inherit (shatteredPackages) shatteredprism-unwrapped shatteredprism;
-            default = shatteredPackages.shatteredprism;
+            inherit (shatteredPackages) elysiumlauncher-unwrapped elysiumlauncher;
+            default = shatteredPackages.elysiumlauncher;
           };
         in
         # Only output them if they're available on the current system
@@ -129,11 +129,11 @@
           legacyPackages = self.legacyPackages.${system};
         in
         {
-          shatteredprism-debug = shatteredPackages.shatteredprism.override {
-            shatteredprism-unwrapped = legacyPackages.shatteredprism-unwrapped-debug;
+          elysiumlauncher-debug = shatteredPackages.elysiumlauncher.override {
+            elysiumlauncher-unwrapped = legacyPackages.elysiumlauncher-unwrapped-debug;
           };
 
-          shatteredprism-unwrapped-debug = shatteredPackages.shatteredprism-unwrapped.overrideAttrs {
+          elysiumlauncher-unwrapped-debug = shatteredPackages.elysiumlauncher-unwrapped.overrideAttrs {
             cmakeBuildType = "Debug";
             dontStrip = true;
           };

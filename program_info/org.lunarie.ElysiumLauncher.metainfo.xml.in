@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-  <id>org.lunaislazier.ShatteredPrism</id>
-  <launchable type="desktop-id">org.lunaislazier.ShatteredPrism.desktop</launchable>
-  <name>Shattered Prism</name>
-  <developer_name>lunaislazier</developer_name>
+  <id>org.lunarie.ElysiumLauncher</id>
+  <launchable type="desktop-id">org.lunarie.ElysiumLauncher.desktop</launchable>
+  <name>Elysium Launcher</name>
+  <developer_name>sammyette</developer_name>
   <summary>A custom launcher for Minecraft that allows you to easily manage multiple installations of Minecraft at once</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
-  <url type="homepage">https://github.com/lunaislazier/ShatteredPrism</url>
-  <url type="bugtracker">https://github.com/lunaislazier/ShatteredPrism/issues</url>
+  <url type="homepage">https://github.com/Lunarienya/ElysiumLauncher</url>
+  <url type="bugtracker">https://github.com/Lunarienya/ElysiumLauncher/issues</url>
   <description>
-    <p>Shattered Prism is a custom launcher for Minecraft that focuses on predictability, long term stability and simplicity.</p>
+    <p>Elysium Launcher is a custom launcher for Minecraft that focuses on predictability, long term stability and simplicity.</p>
     <p>Features:</p>
     <ul>
       <li>Easily install game modifications, such as Fabric, Forge and Quilt</li>

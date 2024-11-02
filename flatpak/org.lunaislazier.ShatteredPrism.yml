@@ -1,11 +1,11 @@
-id: org.lunaislazier.ShatteredPrism
+id: org.lunarie.ElysiumLauncher
 runtime: org.kde.Platform
 runtime-version: 6.7
 sdk: org.kde.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.openjdk17
 
-command: shatteredprism
+command: elysiumlauncher
 finish-args:
   - --share=ipc
   - --socket=x11
@@ -27,7 +27,7 @@ modules:
   # Needed for proper Wayland support
   - libdecor.json
 
-  - name: shatteredprism
+  - name: elysiumlauncher
     buildsystem: cmake-ninja
     builddir: true
     config-opts:
@@ -135,10 +135,10 @@ modules:
     buildsystem: simple
     build-commands:
       - install -Dm755 prime-run /app/bin/prime-run
-      - mv /app/bin/shatteredprism /app/bin/shatteredrun
-      - install -Dm755 shatteredprism /app/bin/shatteredprism
+      - mv /app/bin/elysiumlauncher /app/bin/elysiumrun
+      - install -Dm755 elysiumlauncher /app/bin/elysiumlauncher
     sources:
       - type: file
         path: prime-run
       - type: file
-        path: shatteredprism
+        path: elysiumlauncher
