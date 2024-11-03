@@ -135,9 +135,7 @@ void AccountListPage::listChanged()
 void AccountListPage::on_actionAddAuthlibInjector_triggered()
 {
 
-    MinecraftAccountPtr account = AuthlibInjectorLoginDialog::newAccount(
-        this, tr("Please enter the username and password you've used to register on the Elysium website."
-                 ""));
+    MinecraftAccountPtr account = AuthlibInjectorLoginDialog::newAccount(this);
 
     if (account) {
         m_accounts->addAccount(account);

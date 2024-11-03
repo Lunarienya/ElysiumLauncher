@@ -36,7 +36,7 @@ class AuthlibInjectorLoginDialog : public QDialog {
    public:
     ~AuthlibInjectorLoginDialog();
 
-    static MinecraftAccountPtr newAccount(QWidget* parent, QString message);
+    static MinecraftAccountPtr newAccount(QWidget* parent);
 
    private:
     explicit AuthlibInjectorLoginDialog(QWidget* parent = 0);

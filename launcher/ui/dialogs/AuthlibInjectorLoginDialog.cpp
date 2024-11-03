@@ -197,10 +197,10 @@ void AuthlibInjectorLoginDialog::onTaskStatus(const QString& status)
 }
 
 // Public interface
-MinecraftAccountPtr AuthlibInjectorLoginDialog::newAccount(QWidget* parent, QString msg)
+MinecraftAccountPtr AuthlibInjectorLoginDialog::newAccount(QWidget* parent)
 {
     AuthlibInjectorLoginDialog dlg(parent);
-    dlg.ui->label->setText(msg);
+    dlg.ui->label->setText(tr("Please enter the username and password you've used to register on the Elysium website."));
     if (dlg.exec() == QDialog::Accepted) {
         return dlg.m_account;
     }

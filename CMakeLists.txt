@@ -228,9 +228,9 @@ set(Launcher_ENABLE_JAVA_DOWNLOADER_DEFAULT ON)
 # Although we recommend enabling this, we cannot guarantee binary compatibility on
 # differing Linux/BSD/etc distributions. Downstream packagers should be explicitly opt-ing into this
 # feature if they know it will work with their distribution.
-if(UNIX AND NOT APPLE)
-  set(Launcher_ENABLE_JAVA_DOWNLOADER_DEFAULT OFF)
-endif()
+#if(UNIX AND NOT APPLE)
+#  set(Launcher_ENABLE_JAVA_DOWNLOADER_DEFAULT ON)
+#endif()
 
 # Java downloader
 option(Launcher_ENABLE_JAVA_DOWNLOADER "Build the java downloader feature" ${Launcher_ENABLE_JAVA_DOWNLOADER_DEFAULT})
