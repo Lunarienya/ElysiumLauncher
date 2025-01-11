@@ -138,7 +138,7 @@ shared_qobject_ptr<AuthFlow> MinecraftAccount::login(bool useDeviceCode, std::op
 {
     Q_ASSERT(m_currentTask.get() == nullptr);
 
-    m_currentTask.reset(new AuthFlow(&data, useDeviceCode ? AuthFlow::Action::DeviceCode : AuthFlow::Action::Login));
+    m_currentTask.reset(new AuthFlow(&data, useDeviceCode ? AuthFlow::Action::DeviceCode : AuthFlow::Action::Login, this, password));
     connect(m_currentTask.get(), &Task::succeeded, this, &MinecraftAccount::authSucceeded);
     connect(m_currentTask.get(), &Task::failed, this, &MinecraftAccount::authFailed);
     connect(m_currentTask.get(), &Task::aborted, this, [this] { authFailed(tr("Aborted")); });
@@ -152,7 +152,7 @@ shared_qobject_ptr<AuthFlow> MinecraftAccount::refresh()
         return m_currentTask;
     }
 
-    m_currentTask.reset(new AuthFlow(&data, AuthFlow::Action::Refresh));
+    m_currentTask.reset(new AuthFlow(&data, AuthFlow::Action::Refresh, this));
 
     connect(m_currentTask.get(), &Task::succeeded, this, &MinecraftAccount::authSucceeded);
     connect(m_currentTask.get(), &Task::failed, this, &MinecraftAccount::authFailed);
