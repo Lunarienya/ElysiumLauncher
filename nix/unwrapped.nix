@@ -15,6 +15,7 @@
   stripJavaArchivesHook,
   tomlplusplus,
   zlib,
+
   msaClientID ? null,
   gamemodeSupport ? stdenv.isLinux,
   version,
@@ -64,7 +65,7 @@ stdenv.mkDerivation {
       tomlplusplus
       zlib
     ]
-    ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Cocoa ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [ darwin.apple_sdk.frameworks.Cocoa ]
     ++ lib.optional gamemodeSupport gamemode;
 
   hardeningEnable = lib.optionals stdenv.isLinux [ "pie" ];
