@@ -18,7 +18,10 @@ class AuthFlow : public Task {
    public:
     enum class Action { Refresh, Login, DeviceCode };
 
-    explicit AuthFlow(AccountData* data, Action action = Action::Refresh);
+    explicit AuthFlow(AccountData* data,
+                      Action action = Action::Refresh,
+                      QObject* parent = 0,
+                      std::optional<QString> password = std::nullopt);
     virtual ~AuthFlow() = default;
 
     void executeTask() override;

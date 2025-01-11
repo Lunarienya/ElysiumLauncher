@@ -54,7 +54,6 @@ assert lib.assertMsg (
 let
   shatteredprism' = shatteredprism-unwrapped.override { inherit msaClientID gamemodeSupport; };
 in
-
 symlinkJoin {
   name = "shatteredprism-${shatteredprism'.version}";
 
@@ -97,14 +96,8 @@ symlinkJoin {
     let
       runtimeLibs =
         [
-          stdenv.cc.cc.lib
-          ## native versions
-          glfw3-minecraft
-          openal
-
-          ## openal
-          alsa-lib
-          libjack2
+          # lwjgl
+          glfw
           libpulseaudio
           libGL
           openal
@@ -130,7 +123,6 @@ symlinkJoin {
         pciutils # need lspci
         xorg.xrandr # needed for LWJGL [2.9.2, 3) https://github.com/LWJGL/lwjgl/issues/128
       ] ++ additionalPrograms;
-
     in
     [
       "--prefix SHATTEREDPRISM_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}"

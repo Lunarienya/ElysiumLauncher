@@ -8,7 +8,6 @@
 #include "QObjectPtr.h"
 #include "ResourceDownloadTask.h"
 
-#include "modplatform/ModIndex.h"
 #include "modplatform/helpers/HashUtils.h"
 
 #include "tasks/ConcurrentTask.h"
@@ -41,7 +40,7 @@ void ModrinthCheckUpdate::executeTask()
     setProgress(0, 9);
 
     auto hashing_task =
-        makeShared<ConcurrentTask>("MakeModrinthHashesTask", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
+        makeShared<ConcurrentTask>(this, "MakeModrinthHashesTask", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
     for (auto* mod : m_mods) {
         auto hash = mod->metadata()->hash;
 
@@ -92,15 +91,20 @@ void ModrinthCheckUpdate::checkVersionsResponse(std::shared_ptr<QByteArray> resp
             // it means this specific version is not available
             if (project_obj.isEmpty()) {
                 qDebug() << "Mod " << m_mappings.find(hash).value()->name() << " got an empty response." << "Hash: " << hash;
+
                 continue;
             }
 
             // Sometimes a version may have multiple files, one with "forge" and one with "fabric",
             // so we may want to filter it
             QString loader_filter;
-            for (auto flag : ModPlatform::modLoaderTypesToList(loader)) {
-                loader_filter = ModPlatform::getModLoaderAsString(flag);
-                break;
+            static auto flags = { ModPlatform::ModLoaderType::NeoForge, ModPlatform::ModLoaderType::Forge,
+                                  ModPlatform::ModLoaderType::Quilt, ModPlatform::ModLoaderType::Fabric };
+            for (auto flag : flags) {
+                if (loader.testFlag(flag)) {
+                    loader_filter = ModPlatform::getModLoaderAsString(flag);
+                    break;
+                }
             }
 
             // Currently, we rely on a couple heuristics to determine whether an update is actually available or not:

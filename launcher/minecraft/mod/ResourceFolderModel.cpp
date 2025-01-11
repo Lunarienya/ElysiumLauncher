@@ -261,7 +261,7 @@ bool ResourceFolderModel::update()
     return true;
 }
 
-void ResourceFolderModel::resolveResource(Resource::Ptr res)
+void ResourceFolderModel::resolveResource(Resource* res)
 {
     if (!res->shouldResolve()) {
         return;
@@ -277,14 +277,11 @@ void ResourceFolderModel::resolveResource(Resource::Ptr res)
     m_active_parse_tasks.insert(ticket, task);
 
     connect(
-        task.get(), &Task::succeeded, this, [this, ticket, res] { onParseSucceeded(ticket, res->internal_id()); },
-        Qt::ConnectionType::QueuedConnection);
-    connect(
-        task.get(), &Task::failed, this, [this, ticket, res] { onParseFailed(ticket, res->internal_id()); },
-        Qt::ConnectionType::QueuedConnection);
+        task.get(), &Task::succeeded, this, [=] { onParseSucceeded(ticket, res->internal_id()); }, Qt::ConnectionType::QueuedConnection);
+    connect(task.get(), &Task::failed, this, [=] { onParseFailed(ticket, res->internal_id()); }, Qt::ConnectionType::QueuedConnection);
     connect(
         task.get(), &Task::finished, this,
-        [this, ticket] {
+        [=] {
             m_active_parse_tasks.remove(ticket);
             emit parseFinished();
         },
@@ -320,7 +317,7 @@ void ResourceFolderModel::onUpdateSucceeded()
 void ResourceFolderModel::onParseSucceeded(int ticket, QString resource_id)
 {
     auto iter = m_active_parse_tasks.constFind(ticket);
-    if (iter == m_active_parse_tasks.constEnd() || !m_resources_index.contains(resource_id))
+    if (iter == m_active_parse_tasks.constEnd())
         return;
 
     int row = m_resources_index[resource_id];
@@ -632,7 +629,7 @@ QString ResourceFolderModel::instDirPath() const
 void ResourceFolderModel::onParseFailed(int ticket, QString resource_id)
 {
     auto iter = m_active_parse_tasks.constFind(ticket);
-    if (iter == m_active_parse_tasks.constEnd() || !m_resources_index.contains(resource_id))
+    if (iter == m_active_parse_tasks.constEnd())
         return;
 
     auto removed_index = m_resources_index[resource_id];

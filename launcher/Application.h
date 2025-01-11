@@ -42,7 +42,6 @@
 #include <QDebug>
 #include <QFlag>
 #include <QIcon>
-#include <QMutex>
 #include <QUrl>
 #include <memory>
 
@@ -279,7 +278,6 @@ class Application : public QApplication {
         shared_qobject_ptr<LaunchController> controller;
     };
     std::map<QString, InstanceXtras> m_instanceExtras;
-    mutable QMutex m_instanceExtrasMutex;
 
     // main state variables
     size_t m_openWindows = 0;
@@ -305,13 +303,4 @@ class Application : public QApplication {
     QList<QUrl> m_urlsToImport;
     QString m_instanceIdToShowWindowOf;
     std::unique_ptr<QFile> logFile;
-
-   public:
-    void addQSavePath(QString);
-    void removeQSavePath(QString);
-    bool checkQSavePath(QString);
-
-   private:
-    QHash<QString, int> m_qsaveResources;
-    mutable QMutex m_qsaveResourcesMutex;
 };

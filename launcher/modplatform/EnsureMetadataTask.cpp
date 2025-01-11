@@ -19,32 +19,31 @@ static ModrinthAPI modrinth_api;
 static FlameAPI flame_api;
 
 EnsureMetadataTask::EnsureMetadataTask(Mod* mod, QDir dir, ModPlatform::ResourceProvider prov)
-    : Task(), m_index_dir(dir), m_provider(prov), m_hashingTask(nullptr), m_current_task(nullptr)
+    : Task(nullptr), m_index_dir(dir), m_provider(prov), m_hashing_task(nullptr), m_current_task(nullptr)
 {
-    auto hashTask = createNewHash(mod);
-    if (!hashTask)
+    auto hash_task = createNewHash(mod);
+    if (!hash_task)
         return;
-    connect(hashTask.get(), &Hashing::Hasher::resultsReady, [this, mod](QString hash) { m_mods.insert(hash, mod); });
-    connect(hashTask.get(), &Task::failed, [this, mod] { emitFail(mod, "", RemoveFromList::No); });
-    m_hashingTask = hashTask;
+    connect(hash_task.get(), &Hashing::Hasher::resultsReady, [this, mod](QString hash) { m_mods.insert(hash, mod); });
+    connect(hash_task.get(), &Task::failed, [this, mod] { emitFail(mod, "", RemoveFromList::No); });
+    hash_task->start();
 }
 
 EnsureMetadataTask::EnsureMetadataTask(QList<Mod*>& mods, QDir dir, ModPlatform::ResourceProvider prov)
-    : Task(), m_index_dir(dir), m_provider(prov), m_current_task(nullptr)
+    : Task(nullptr), m_index_dir(dir), m_provider(prov), m_current_task(nullptr)
 {
-    auto hashTask = makeShared<ConcurrentTask>("MakeHashesTask", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
-    m_hashingTask = hashTask;
+    m_hashing_task.reset(new ConcurrentTask(this, "MakeHashesTask", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt()));
     for (auto* mod : mods) {
         auto hash_task = createNewHash(mod);
         if (!hash_task)
             continue;
         connect(hash_task.get(), &Hashing::Hasher::resultsReady, [this, mod](QString hash) { m_mods.insert(hash, mod); });
         connect(hash_task.get(), &Task::failed, [this, mod] { emitFail(mod, "", RemoveFromList::No); });
-        hashTask->addTask(hash_task);
+        m_hashing_task->addTask(hash_task);
     }
 }
 EnsureMetadataTask::EnsureMetadataTask(QHash<QString, Mod*>& mods, QDir dir, ModPlatform::ResourceProvider prov)
-    : Task(), m_mods(mods), m_index_dir(dir), m_provider(prov), m_current_task(nullptr)
+    : Task(nullptr), m_mods(mods), m_index_dir(dir), m_provider(prov), m_current_task(nullptr)
 {}
 
 Hashing::Hasher::Ptr EnsureMetadataTask::createNewHash(Mod* mod)
