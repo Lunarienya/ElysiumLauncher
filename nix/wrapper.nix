@@ -1,51 +1,56 @@
 {
-  addDriverRunpath,
-  alsa-lib,
-  flite,
-  gamemode,
-  glfw3-minecraft,
-  jdk17,
-  jdk21,
-  jdk8,
-  kdePackages,
   lib,
-  libGL,
-  libX11,
-  libXcursor,
-  libXext,
-  libXrandr,
-  libXxf86vm,
-  libjack2,
-  libpulseaudio,
-  libusb1,
-  mesa-demos,
-  openal,
-  pciutils,
-  pipewire,
-  shatteredprism-unwrapped,
   stdenv,
   symlinkJoin,
+  shatteredprism-unwrapped,
+  addDriverRunpath,
+  flite,
+  gamemode,
+  glfw,
+  glfw-wayland-minecraft,
+  glxinfo,
+  jdk8,
+  jdk17,
+  jdk21,
+  kdePackages,
+  libGL,
+  libpulseaudio,
+  libusb1,
+  makeWrapper,
+  openal,
+  pciutils,
   udev,
   vulkan-loader,
-  xrandr,
+  xorg,
   additionalLibs ? [ ],
   additionalPrograms ? [ ],
-  controllerSupport ? stdenv.hostPlatform.isLinux,
-  gamemodeSupport ? stdenv.hostPlatform.isLinux,
+  controllerSupport ? stdenv.isLinux,
+  gamemodeSupport ? stdenv.isLinux,
   jdks ? [
     jdk21
     jdk17
     jdk8
   ],
   msaClientID ? null,
-  textToSpeechSupport ? stdenv.hostPlatform.isLinux,
+  textToSpeechSupport ? stdenv.isLinux,
+  # Adds `glfw-wayland-minecraft` to `LD_LIBRARY_PATH`
+  # when launched on wayland, allowing for the game to be run natively.
+  # Make sure to enable "Use system installation of GLFW" in instance settings
+  # for this to take effect
+  #
+  # Warning: This build of glfw may be unstable, and the launcher
+  # itself can take slightly longer to start
+  withWaylandGLFW ? false,
 }:
 assert lib.assertMsg (
-  controllerSupport -> stdenv.hostPlatform.isLinux
+  controllerSupport -> stdenv.isLinux
 ) "controllerSupport only has an effect on Linux.";
 assert lib.assertMsg (
-  textToSpeechSupport -> stdenv.hostPlatform.isLinux
+  textToSpeechSupport -> stdenv.isLinux
 ) "textToSpeechSupport only has an effect on Linux.";
+assert lib.assertMsg (
+  withWaylandGLFW -> stdenv.isLinux
+) "withWaylandGLFW is only available on Linux.";
 let
   shatteredprism' = shatteredprism-unwrapped.override { inherit msaClientID gamemodeSupport; };
 in
@@ -55,7 +60,13 @@ symlinkJoin {
 
   paths = [ shatteredprism' ];
 
-  nativeBuildInputs = [ kdePackages.wrapQtAppsHook ];
+  nativeBuildInputs =
+    [
+      kdePackages.wrapQtAppsHook
+    ]
+    # purposefully using a shell wrapper here for variable expansion
+    # see https://github.com/NixOS/nixpkgs/issues/172583
+    ++ lib.optional withWaylandGLFW makeWrapper;
 
   buildInputs =
     [
@@ -63,18 +74,30 @@ symlinkJoin {
       kdePackages.qtsvg
     ]
     ++ lib.optional (
-      lib.versionAtLeast kdePackages.qtbase.version "6" && stdenv.hostPlatform.isLinux
+      lib.versionAtLeast kdePackages.qtbase.version "6" && stdenv.isLinux
     ) kdePackages.qtwayland;
 
-  postBuild = ''
-    wrapQtAppsHook
-  '';
+  env = {
+    waylandPreExec = lib.optionalString withWaylandGLFW ''
+      if [ -n "$WAYLAND_DISPLAY" ]; then
+        export LD_LIBRARY_PATH=${lib.getLib glfw-wayland-minecraft}/lib:"$LD_LIBRARY_PATH"
+      fi
+    '';
+  };
+
+  postBuild =
+    lib.optionalString withWaylandGLFW ''
+      qtWrapperArgs+=(--run "$waylandPreExec")
+    ''
+    + ''
+      wrapQtAppsHook
+    '';
 
   qtWrapperArgs =
     let
       runtimeLibs =
         [
-          (lib.getLib stdenv.cc.cc)
+          stdenv.cc.cc.lib
           ## native versions
           glfw3-minecraft
           openal
@@ -83,19 +106,19 @@ symlinkJoin {
           alsa-lib
           libjack2
           libpulseaudio
-          pipewire
-
-          ## glfw
           libGL
-          libX11
-          libXcursor
-          libXext
-          libXrandr
-          libXxf86vm
+          openal
+          stdenv.cc.cc.lib
+
+          vulkan-loader # VulkanMod's lwjgl
 
           udev # oshi
 
-          vulkan-loader # VulkanMod's lwjgl
+          xorg.libX11
+          xorg.libXext
+          xorg.libXcursor
+          xorg.libXrandr
+          xorg.libXxf86vm
         ]
         ++ lib.optional textToSpeechSupport flite
         ++ lib.optional gamemodeSupport gamemode.lib
@@ -103,14 +126,16 @@ symlinkJoin {
         ++ additionalLibs;
 
       runtimePrograms = [
-        mesa-demos
+        glxinfo
         pciutils # need lspci
-        xrandr # needed for LWJGL [2.9.2, 3) https://github.com/LWJGL/lwjgl/issues/128
+        xorg.xrandr # needed for LWJGL [2.9.2, 3) https://github.com/LWJGL/lwjgl/issues/128
       ] ++ additionalPrograms;
 
     in
-    [ "--prefix SHATTEREDPRISM_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}" ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [
+    [
+      "--prefix SHATTEREDPRISM_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}"
+    ]
+    ++ lib.optionals stdenv.isLinux [
       "--set LD_LIBRARY_PATH ${addDriverRunpath.driverLink}/lib:${lib.makeLibraryPath runtimeLibs}"
       "--prefix PATH : ${lib.makeBinPath runtimePrograms}"
     ];

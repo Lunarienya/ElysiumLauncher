@@ -1,5 +1,11 @@
 # Shattered Prism Nix Packaging
 
+## Installing a stable release (nixpkgs)
+
+Shattered Prism is packaged in [nixpkgs](https://github.com/NixOS/nixpkgs/) since 22.11.
+
+See [Package variants](#package-variants) for a list of available packages.
+
 ## Installing a development release (flake)
 
 We use [cachix](https://cachix.org/) to cache our development and release builds.
@@ -199,7 +205,7 @@ nix-env -iA shatteredprism.shatteredprism
 
 ## Package variants
 
-This repository offers the following packages:
+Both Nixpkgs and this repository offer the following packages:
 
 - `shatteredprism` - The preferred build, wrapped with everything necessary to run the launcher and Minecraft
 - `shatteredprism-unwrapped` - A minimal build that allows for advanced customization of the launcher's runtime environment

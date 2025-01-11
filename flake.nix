@@ -85,17 +85,23 @@
 
       formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
 
-      overlays.default = final: prev: {
-        shatteredprism-unwrapped = prev.callPackage ./nix/unwrapped.nix {
-          inherit
-            libnbtplusplus
-            nix-filter
-            self
-            ;
-        };
+      overlays.default =
+        final: prev:
+        let
+          version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
+        in
+        {
+          shatteredprism-unwrapped = prev.callPackage ./nix/unwrapped.nix {
+            inherit
+              libnbtplusplus
+              nix-filter
+              self
+              version
+              ;
+          };
 
-        shatteredprism = final.callPackage ./nix/wrapper.nix { };
-      };
+          shatteredprism = final.callPackage ./nix/wrapper.nix { };
+        };
 
       packages = forAllSystems (
         system:

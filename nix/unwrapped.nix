@@ -3,13 +3,12 @@
   stdenv,
   cmake,
   cmark,
-  apple-sdk_11,
+  darwin,
   extra-cmake-modules,
   gamemode,
   ghc_filesystem,
   jdk17,
   kdePackages,
-  libnbtplusplus,
   ninja,
   nix-filter,
   self,
@@ -18,14 +17,16 @@
   zlib,
 
   msaClientID ? null,
-  gamemodeSupport ? stdenv.hostPlatform.isLinux,
+  gamemodeSupport ? stdenv.isLinux,
+  version,
+  libnbtplusplus,
 }:
 assert lib.assertMsg (
-  gamemodeSupport -> stdenv.hostPlatform.isLinux
+  gamemodeSupport -> stdenv.isLinux
 ) "gamemodeSupport is only available on Linux.";
 stdenv.mkDerivation {
   pname = "shatteredprism-unwrapped";
-  version = self.shortRev or self.dirtyShortRev or "unknown";
+  inherit version;
 
   src = nix-filter.lib {
     root = self;
@@ -64,23 +65,20 @@ stdenv.mkDerivation {
       tomlplusplus
       zlib
     ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ apple-sdk_11 ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [ darwin.apple_sdk.frameworks.Cocoa ]
     ++ lib.optional gamemodeSupport gamemode;
 
-  hardeningEnable = lib.optionals stdenv.hostPlatform.isLinux [ "pie" ];
+  hardeningEnable = lib.optionals stdenv.isLinux [ "pie" ];
 
   cmakeFlags =
-    [
-      # downstream branding
-      (lib.cmakeFeature "Launcher_BUILD_PLATFORM" "nixpkgs")
-    ]
+    [ (lib.cmakeFeature "Launcher_BUILD_PLATFORM" "nixpkgs") ]
     ++ lib.optionals (msaClientID != null) [
       (lib.cmakeFeature "Launcher_MSA_CLIENT_ID" (toString msaClientID))
     ]
     ++ lib.optionals (lib.versionOlder kdePackages.qtbase.version "6") [
       (lib.cmakeFeature "Launcher_QT_VERSION_MAJOR" "5")
     ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    ++ lib.optionals stdenv.isDarwin [
       # we wrap our binary manually
       (lib.cmakeFeature "INSTALL_BUNDLE" "nodeps")
       # disable built-in updater
@@ -102,7 +100,7 @@ stdenv.mkDerivation {
     homepage = "https://github.com/lunaislazier/ShatteredPrism";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [
-      evan-goode
+      lunaislazier
     ];
     mainProgram = "shatteredprism";
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
