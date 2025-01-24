@@ -60,7 +60,6 @@ class Config {
     /// The minor version number.
     int VERSION_MINOR;
 
-
     /**
      * The version channel
      * This is used by the updater to determine what channel the current version came from.
