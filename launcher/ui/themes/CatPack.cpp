@@ -46,7 +46,7 @@
 QString BasicCatPack::path()
 {
     const auto now = QDate::currentDate();
-    const auto birthday = QDate(now.year(), 2, 4);
+    const auto birthday = QDate(now.year(), 11, 2);
     const auto xmas = QDate(now.year(), 12, 25);
     const auto halloween = QDate(now.year(), 10, 31);
 
