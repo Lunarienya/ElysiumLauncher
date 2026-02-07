@@ -93,6 +93,7 @@ jobs:
           prerelease: false
           files: |
             ElysiumLauncher-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
+            ElysiumLauncher-Linux-${{ env.VERSION }}-Flatpak.flatpak
             ElysiumLauncher-Linux-x86_64.AppImage
             ElysiumLauncher-Linux-x86_64.AppImage.zsync
             ElysiumLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
