@@ -22,7 +22,7 @@
   openal,
   pciutils,
   pipewire,
-  shatteredprism-unwrapped,
+  elysiumlauncher-unwrapped,
   stdenv,
   symlinkJoin,
   udev,
@@ -51,13 +51,13 @@ assert lib.assertMsg (
 ) "textToSpeechSupport only has an effect on Linux.";
 
 let
-  shatteredprism' = shatteredprism-unwrapped.override { inherit msaClientID; };
+  elysiumlauncher' = elysiumlauncher-unwrapped.override { inherit msaClientID; };
 in
 
 symlinkJoin {
-  name = "shatteredprism-${shatteredprism'.version}";
+  name = "elysiumlauncher-${elysiumlauncher'.version}";
 
-  paths = [ shatteredprism' ];
+  paths = [ elysiumlauncher' ];
 
   nativeBuildInputs = [ kdePackages.wrapQtAppsHook ];
 
@@ -120,7 +120,7 @@ symlinkJoin {
     ];
 
   meta = {
-    inherit (shatteredprism'.meta)
+    inherit (elysiumlauncher'.meta)
       description
       longDescription
       homepage

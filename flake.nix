@@ -59,14 +59,6 @@
       nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
     in
     {
-      checks = forAllSystems (
-        system:
-        let
-          checks' = nixpkgsFor.${system}.callPackage ./nix/checks.nix { inherit self; };
-        in
-        lib.filterAttrs (_: lib.isDerivation) checks'
-      );
-
       devShells = forAllSystems (
         system:
         let

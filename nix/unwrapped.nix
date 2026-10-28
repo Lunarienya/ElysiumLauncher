@@ -38,7 +38,7 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "shatteredprism-unwrapped";
+  pname = "elysiumlauncher-unwrapped";
   version = "1.9unstable-${date}";
 
   src = lib.fileset.toSource {
@@ -106,12 +106,12 @@ stdenv.mkDerivation {
       their own mods, texture packs, saves, etc) and helps you manage them and
       their associated options with a simple interface.
     '';
-    homepage = "https://github.com/Noctilune/ShatteredPrism";
+    homepage = "https://github.com/Lunarienya/ElysiumLauncher";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [
       lunaislazier
     ];
-    mainProgram = "shatteredprism";
+    mainProgram = "elysiumlauncher";
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 }
