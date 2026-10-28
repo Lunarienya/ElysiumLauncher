@@ -30,20 +30,7 @@ runs:
     - name: Setup build variables
       shell: bash
       run: |
-        # Fixup architecture naming for AppImages
-        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
-        case "$dpkg_arch" in
-          "amd64")
-            APPIMAGE_ARCH="x86_64"
-            ;;
-          "arm64")
-            APPIMAGE_ARCH="aarch64"
-            ;;
-          *)
-            echo "# 🚨 The Debian architecture \"$deb_arch\" is not recognized!" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-            ;;
-        esac
+        APPIMAGE_ARCH="x86_64"
         echo "APPIMAGE_ARCH=$APPIMAGE_ARCH" >> "$GITHUB_ENV"
 
         # Used for the file paths of libraries

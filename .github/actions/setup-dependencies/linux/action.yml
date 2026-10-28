@@ -19,20 +19,7 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        # Determinate AppImage architecture to use
-        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
-        case "$dpkg_arch" in
-          "amd64")
-            APPIMAGE_ARCH="x86_64"
-            ;;
-          "arm64")
-            APPIMAGE_ARCH="aarch64"
-            ;;
-          *)
-            echo "# 🚨 The Debian architecture \"$deb_arch\" is not recognized!" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-            ;;
-        esac
+        APPIMAGE_ARCH="x86_64"
 
         gh release download \
           --repo VHSgunzo/sharun \
