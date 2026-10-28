@@ -10,6 +10,8 @@ endif()
 
 set(Launcher_CommonName "ElysiumLauncher")
 set(Launcher_DisplayName "Elysium Launcher")
+set(Launcher_AppID "org.lunarie.ElysiumLauncher")
+set(Launcher_AppID "${Launcher_AppID}" PARENT_SCOPE)
 
 set(Launcher_Name "${Launcher_CommonName}" PARENT_SCOPE)
 set(Launcher_DisplayName "${Launcher_DisplayName}" PARENT_SCOPE)
@@ -23,6 +25,7 @@ set(Launcher_ConfigFile "elysiumlauncher.cfg" PARENT_SCOPE)
 set(Launcher_Git "https://github.com/Lunarienya/ElysiumLauncher" PARENT_SCOPE)
 set(Launcher_DesktopFileName "org.lunarie.ElysiumLauncher.desktop" PARENT_SCOPE)
 set(Launcher_SVGFileName "org.lunarie.ElysiumLauncher.svg" PARENT_SCOPE)
+set(Launcher_Branding_MAC_ICON "program_info/ShatteredPrism.icon" PARENT_SCOPE)
 
 set(Launcher_Desktop "program_info/org.lunarie.ElysiumLauncher.desktop" PARENT_SCOPE)
 set(Launcher_mrpack_MIMEInfo "program_info/modrinth-mrpack-mime.xml" PARENT_SCOPE)
