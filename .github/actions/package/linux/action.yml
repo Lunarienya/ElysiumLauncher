@@ -78,20 +78,20 @@ runs:
         # FIXME(@getchoo): gamemode doesn't seem to be very portable with DBus. Find a way to make it work!
         find "$INSTALL_APPIMAGE_DIR" -name '*gamemode*' -exec rm {} +
 
-        ln -s org.Noctilune.ShatteredPrism.metainfo.xml "$INSTALL_APPIMAGE_DIR"/share/metainfo/org.Noctilune.ShatteredPrism.appdata.xml
-        ln -s share/applications/org.Noctilune.ShatteredPrism.desktop "$INSTALL_APPIMAGE_DIR"
-        ln -s share/icons/hicolor/256x256/apps/org.Noctilune.ShatteredPrism.png "$INSTALL_APPIMAGE_DIR"
+        ln -s org.lunarie.ElysiumLauncher.metainfo.xml "$INSTALL_APPIMAGE_DIR"/share/metainfo/org.lunarie.ElysiumLauncher.appdata.xml
+        ln -s share/applications/org.lunarie.ElysiumLauncher.desktop "$INSTALL_APPIMAGE_DIR"
+        ln -s share/icons/hicolor/scalable/apps/org.lunarie.ElysiumLauncher.svg "$INSTALL_APPIMAGE_DIR"
         mv "$INSTALL_APPIMAGE_DIR"/{sharun,AppRun}
         ls -la "$INSTALL_APPIMAGE_DIR"
 
         if [[ "${{ github.ref_type }}" == "tag" ]]; then
-          APPIMAGE_DEST="ShatteredPrism-Linux-$APPIMAGE_ARCH.AppImage"
+          APPIMAGE_DEST="ElysiumLauncher-Linux-$APPIMAGE_ARCH.AppImage"
         else
-          APPIMAGE_DEST="ShatteredPrism-Linux-$VERSION-${{ inputs.build-type }}-$APPIMAGE_ARCH.AppImage"
+          APPIMAGE_DEST="ElysiumLauncher-Linux-$VERSION-${{ inputs.build-type }}-$APPIMAGE_ARCH.AppImage"
         fi
 
         mkappimage \
-          --updateinformation "gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|ShatteredPrism-Linux-$APPIMAGE_ARCH.AppImage.zsync" \
+          --updateinformation "gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|ElysiumLauncher-Linux-$APPIMAGE_ARCH.AppImage.zsync" \
           "$INSTALL_APPIMAGE_DIR" \
           "$APPIMAGE_DEST"
 
@@ -116,22 +116,22 @@ runs:
 
         for l in $(find ${{ env.INSTALL_PORTABLE_DIR }} -type f -o -type l); do l=${l#$(pwd)/}; l=${l#${{ env.INSTALL_PORTABLE_DIR }}/}; l=${l#./}; echo $l; done > ${{ env.INSTALL_PORTABLE_DIR }}/manifest.txt
         cd ${{ env.INSTALL_PORTABLE_DIR }}
-        tar -czf ../ShatteredPrism-portable.tar.gz *
+        tar -czf ../ElysiumLauncher-portable.tar.gz *
 
     - name: Upload binary tarball
       uses: actions/upload-artifact@v6
       with:
-        name: ShatteredPrism-${{ inputs.artifact-name }}-Qt6-Portable-${{ inputs.version }}-${{ inputs.build-type }}
-        path: ShatteredPrism-portable.tar.gz
+        name: ElysiumLauncher-${{ inputs.artifact-name }}-Qt6-Portable-${{ inputs.version }}-${{ inputs.build-type }}
+        path: ElysiumLauncher-portable.tar.gz
 
     - name: Upload AppImage
       uses: actions/upload-artifact@v6
       with:
-        name: ShatteredPrism-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage
-        path: ShatteredPrism-${{ runner.os }}-*${{ env.APPIMAGE_ARCH }}.AppImage
+        name: ElysiumLauncher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage
+        path: ElysiumLauncher-${{ runner.os }}-*${{ env.APPIMAGE_ARCH }}.AppImage
 
     - name: Upload AppImage Zsync
       uses: actions/upload-artifact@v6
       with:
-        name: ShatteredPrism-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage.zsync
-        path: ShatteredPrism-${{ runner.os }}-*${{ env.APPIMAGE_ARCH }}.AppImage.zsync
+        name: ElysiumLauncher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage.zsync
+        path: ElysiumLauncher-${{ runner.os }}-*${{ env.APPIMAGE_ARCH }}.AppImage.zsync
