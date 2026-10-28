@@ -44,6 +44,8 @@ configure_file(org.lunarie.ElysiumLauncher.metainfo.xml.in org.lunarie.ElysiumLa
 configure_file(elysiumlauncher.rc.in elysiumlauncher.rc @ONLY)
 configure_file(elysiumlauncher.manifest.in elysiumlauncher.manifest @ONLY)
 configure_file(elysiumlauncher.ico elysiumlauncher.ico COPYONLY)
+configure_file(elysiumlauncher.qrc elysiumlauncher.qrc COPYONLY)
+configure_file(org.lunarie.ElysiumLauncher.svg org.lunarie.ElysiumLauncher.svg COPYONLY)
 
 if(MSVC)
     set(Launcher_MSVC_Redist_NSIS_Section [=[
