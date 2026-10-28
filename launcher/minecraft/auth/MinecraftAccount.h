@@ -119,7 +119,7 @@ class MinecraftAccount : public QObject, public Usable {
 
     bool usesCustomApiServers() const { return data.usesCustomApiServers(); }
 
-    bool supportsSkinManagement() const { return data.supportsSkinManagement(); }
+    bool canUploadSkins() const { return data.canUploadSkins(); }
 
     QString accountDisplayString() const { return data.accountDisplayString(); }
 
@@ -131,9 +131,9 @@ class MinecraftAccount : public QObject, public Usable {
 
     bool isActive() const;
 
-    [[nodiscard]] AccountType accountType() const noexcept { return data.type; }
+    AccountType accountType() const noexcept { return data.type; }
 
-    bool ownsMinecraft() const { return data.type != AccountType::Offline && data.minecraftEntitlement.ownsMinecraft; }
+    bool ownsMinecraft() const { return data.type == AccountType::Offline || data.minecraftEntitlement.ownsMinecraft; }
 
     bool hasProfile() const { return data.profileId().size() != 0; }
 
@@ -160,9 +160,10 @@ class MinecraftAccount : public QObject, public Usable {
         switch (data.type) {
             case AccountType::AuthlibInjector: {
                 // This typeString gets passed to Minecraft; any Yggdrasil
-                // account should have the "mojang" type regardless of which
-                // servers are used.
-                return "mojang";
+                // account should have the "msa" type since using the
+                // "mojang" type results in the profile key not being set
+                // on 1.19.3-1.21.8, breaking enforce-secure-profile.
+                return "msa";
             } break;
             case AccountType::MSA: {
                 return "msa";

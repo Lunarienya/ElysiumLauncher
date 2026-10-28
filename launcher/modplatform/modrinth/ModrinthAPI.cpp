@@ -54,7 +54,7 @@ Task::Ptr ModrinthAPI::latestVersion(QString hash,
     if (mcVersions.has_value()) {
         QStringList game_versions;
         for (auto& ver : mcVersions.value()) {
-            game_versions.append(ver.toString());
+            game_versions.append(mapMCVersionToModrinth(ver));
         }
         Json::writeStringList(body_obj, "game_versions", game_versions);
     }
@@ -87,7 +87,7 @@ Task::Ptr ModrinthAPI::latestVersions(const QStringList& hashes,
     if (mcVersions.has_value()) {
         QStringList game_versions;
         for (auto& ver : mcVersions.value()) {
-            game_versions.append(ver.toString());
+            game_versions.append(mapMCVersionToModrinth(ver));
         }
         Json::writeStringList(body_obj, "game_versions", game_versions);
     }
@@ -147,7 +147,7 @@ QList<ModPlatform::Category> ModrinthAPI::loadCategories(std::shared_ptr<QByteAr
         for (auto val : arr) {
             auto cat = Json::requireObject(val);
             auto name = Json::requireString(cat, "name");
-            if (Json::ensureString(cat, "project_type", "") == projectType)
+            if (cat["project_type"].toString() == projectType)
                 categories.push_back({ name, name });
         }
 
