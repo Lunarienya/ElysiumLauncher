@@ -66,10 +66,7 @@
         {
           default = pkgs.mkShell {
             inputsFrom = [ self.packages.${system}.elysiumlauncher-unwrapped ];
-            buildInputs = with pkgs; [
-              ccache
-              ninja
-            ];
+            buildInputs = with pkgs; [ ninja ] ++ lib.optionals stdenv.hostPlatform.isLinux [ ccache ];
           };
         }
       );
