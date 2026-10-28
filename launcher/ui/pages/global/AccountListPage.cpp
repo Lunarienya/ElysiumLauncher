@@ -47,9 +47,9 @@
 #include "net/NetJob.h"
 
 #include "ui/dialogs/AuthlibInjectorLoginDialog.h"
+#include "ui/dialogs/ChooseOfflineNameDialog.h"
 #include "ui/dialogs/CustomMessageBox.h"
 #include "ui/dialogs/MSALoginDialog.h"
-#include "ui/dialogs/OfflineLoginDialog.h"
 
 #include "Application.h"
 
@@ -159,8 +159,11 @@ void AccountListPage::on_actionAddMicrosoft_triggered()
 void AccountListPage::on_actionAddOffline_triggered()
 {
 
-    MinecraftAccountPtr account =
-        OfflineLoginDialog::newAccount(this, tr("Please enter your desired username to add your offline account."));
+    ChooseOfflineNameDialog dialog(tr("Please enter your desired username to add your offline account."), this);
+    MinecraftAccountPtr account;
+    if (dialog.exec() == QDialog::Accepted) {
+        account = MinecraftAccount::createOffline(dialog.getUsername());
+    }
 
     if (account) {
         m_accounts->addAccount(account);
@@ -223,7 +226,7 @@ void AccountListPage::updateButtonStates()
         MinecraftAccountPtr account = selected.data(AccountList::PointerRole).value<MinecraftAccountPtr>();
         accountIsReady = !account->isActive();
         accountIsOnline = account->accountType() != AccountType::Offline;
-        accountSupportsSkinManagement = account->supportsSkinManagement();
+        accountSupportsSkinManagement = account->canUploadSkins();
     }
     ui->actionRemove->setEnabled(accountIsReady);
     ui->actionSetDefault->setEnabled(accountIsReady);

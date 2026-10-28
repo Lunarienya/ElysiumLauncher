@@ -38,12 +38,11 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QRegularExpression>
 #include <QUuid>
 #include "BuildConfig.h"
 
 namespace {
-void tokenToJSONV3(QJsonObject& parent, Token t, const char* tokenName)
+void tokenToJSONV3(QJsonObject& parent, const Token& t, const char* tokenName)
 {
     if (!t.persistent) {
         return;
@@ -133,6 +132,8 @@ void profileToJSONV3(QJsonObject& parent, MinecraftProfile p, const char* tokenN
         out["skin"] = skinObj;
     }
 
+    out["canUploadSkins"] = p.canUploadSkins;
+
     QJsonArray capesArray;
     for (auto& cape : p.capes) {
         QJsonObject capeObj;
@@ -182,6 +183,7 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
         }
         out.skin.id = idV.toString();
         out.skin.url = urlV.toString();
+        out.skin.url.replace("http://textures.minecraft.net", "https://textures.minecraft.net");
         out.skin.variant = variantV.toString();
 
         // data for skin is optional
@@ -193,6 +195,11 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
             qWarning() << "skin data is something unexpected";
             return MinecraftProfile();
         }
+    }
+
+    out.canUploadSkins = true;
+    if (tokenObject.value("canUploadSkins").isBool()) {
+        out.canUploadSkins = tokenObject.value("canUploadskins").toBool();
     }
 
     {
@@ -218,6 +225,7 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
             Cape cape;
             cape.id = idV.toString();
             cape.url = urlV.toString();
+            cape.url.replace("http://textures.minecraft.net", "https://textures.minecraft.net");
             cape.alias = aliasV.toString();
 
             // data for cape is optional.
@@ -383,9 +391,9 @@ bool AccountData::usesCustomApiServers() const
     return type == AccountType::AuthlibInjector;
 }
 
-bool AccountData::supportsSkinManagement() const
+bool AccountData::canUploadSkins() const
 {
-    return type == AccountType::MSA;
+    return minecraftProfile.canUploadSkins;
 }
 
 QString AccountData::authServerUrl() const

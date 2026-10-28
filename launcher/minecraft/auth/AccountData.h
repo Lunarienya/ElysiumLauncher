@@ -36,12 +36,11 @@
 #pragma once
 #include <QByteArray>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
-#include <QVector>
 
 #include <QDateTime>
 #include <QMap>
-#include <QString>
 #include <QVariantMap>
 
 enum class Validity { None, Assumed, Certain };
@@ -82,6 +81,7 @@ struct MinecraftEntitlement {
 struct MinecraftProfile {
     QString id;
     QString name;
+    bool canUploadSkins = true;
     Skin skin;
     QString currentCape;
     QMap<QString, Cape> capes;
@@ -96,7 +96,7 @@ struct AccountData {
     QJsonObject saveState() const;
     bool resumeStateFromV3(QJsonObject data);
 
-    bool supportsSkinManagement() const;
+    bool canUploadSkins() const;
     bool usesCustomApiServers() const;
     QString authServerUrl() const;
     QString accountServerUrl() const;

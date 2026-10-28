@@ -40,10 +40,6 @@
 #include "Application.h"
 
 #include <Version.h>
-#include <qlogging.h>
-#include <quazip/quazip.h>
-#include <quazip/quazipdir.h>
-#include <quazip/quazipfile.h>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
@@ -74,6 +70,7 @@
 #include "PackProfile_p.h"
 #include "modplatform/ModIndex.h"
 
+#include "archive/ArchiveReader.h"
 #include "minecraft/Logging.h"
 
 #include "ui/dialogs/CustomMessageBox.h"
@@ -137,18 +134,18 @@ static ComponentPtr componentFromJsonV1(PackProfile* parent, const QString& comp
     auto uid = Json::requireString(obj.value("uid"));
     auto filePath = componentJsonPattern.arg(uid);
     auto component = makeShared<Component>(parent, uid);
-    component->m_version = Json::ensureString(obj.value("version"));
-    component->m_dependencyOnly = Json::ensureBoolean(obj.value("dependencyOnly"), false);
-    component->m_important = Json::ensureBoolean(obj.value("important"), false);
+    component->m_version = obj.value("version").toString();
+    component->m_dependencyOnly = obj.value("dependencyOnly").toBool();
+    component->m_important = obj.value("important").toBool();
 
     // cached
     // TODO @RESILIENCE: ignore invalid values/structure here?
-    component->m_cachedVersion = Json::ensureString(obj.value("cachedVersion"));
-    component->m_cachedName = Json::ensureString(obj.value("cachedName"));
+    component->m_cachedVersion = obj.value("cachedVersion").toString();
+    component->m_cachedName = obj.value("cachedName").toString();
     Meta::parseRequires(obj, &component->m_cachedRequires, "cachedRequires");
     Meta::parseRequires(obj, &component->m_cachedConflicts, "cachedConflicts");
-    component->m_cachedVolatile = Json::ensureBoolean(obj.value("volatile"), false);
-    bool disabled = Json::ensureBoolean(obj.value("disabled"), false);
+    component->m_cachedVolatile = obj.value("volatile").toBool();
+    bool disabled = obj.value("disabled").toBool();
     component->setEnabled(!disabled);
     return component;
 }
@@ -180,29 +177,32 @@ static bool savePackProfile(const QString& filename, const ComponentContainer& c
 }
 
 // Read the given file into component containers
-static bool loadPackProfile(PackProfile* parent,
-                            const QString& filename,
-                            const QString& componentJsonPattern,
-                            ComponentContainer& container)
+static PackProfile::Result loadPackProfile(PackProfile* parent,
+                                           const QString& filename,
+                                           const QString& componentJsonPattern,
+                                           ComponentContainer& container)
 {
     QFile componentsFile(filename);
     if (!componentsFile.exists()) {
-        qCWarning(instanceProfileC) << "Components file" << filename << "doesn't exist. This should never happen.";
-        return false;
+        auto message = QObject::tr("Components file %1 doesn't exist. This should never happen.").arg(filename);
+        qCWarning(instanceProfileC) << message;
+        return PackProfile::Result::Error(message);
     }
     if (!componentsFile.open(QFile::ReadOnly)) {
-        qCCritical(instanceProfileC) << "Couldn't open" << componentsFile.fileName() << " for reading:" << componentsFile.errorString();
+        auto message = QObject::tr("Couldn't open %1 for reading: %2").arg(componentsFile.fileName(), componentsFile.errorString());
+        qCCritical(instanceProfileC) << message;
         qCWarning(instanceProfileC) << "Ignoring overridden order";
-        return false;
+        return PackProfile::Result::Error(message);
     }
 
     // and it's valid JSON
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(componentsFile.readAll(), &error);
     if (error.error != QJsonParseError::NoError) {
-        qCCritical(instanceProfileC) << "Couldn't parse" << componentsFile.fileName() << ":" << error.errorString();
+        auto message = QObject::tr("Couldn't parse %1 as json: %2").arg(componentsFile.fileName(), error.errorString());
+        qCCritical(instanceProfileC) << message;
         qCWarning(instanceProfileC) << "Ignoring overridden order";
-        return false;
+        return PackProfile::Result::Error(message);
     }
 
     // and then read it and process it if all above is true.
@@ -219,11 +219,13 @@ static bool loadPackProfile(PackProfile* parent,
             container.append(componentFromJsonV1(parent, componentJsonPattern, comp_obj));
         }
     } catch ([[maybe_unused]] const JSONValidationError& err) {
-        qCCritical(instanceProfileC) << "Couldn't parse" << componentsFile.fileName() << ": bad file format";
+        auto message = QObject::tr("Couldn't parse %1 : bad file format").arg(componentsFile.fileName());
+        qCCritical(instanceProfileC) << message;
+        qCWarning(instanceProfileC) << "error:" << err.what();
         container.clear();
-        return false;
+        return PackProfile::Result::Error(message);
     }
-    return true;
+    return PackProfile::Result::Success();
 }
 
 // END: component file format
@@ -290,44 +292,43 @@ void PackProfile::save_internal()
     d->dirty = false;
 }
 
-bool PackProfile::load()
+PackProfile::Result PackProfile::load()
 {
     auto filename = componentsFilePath();
 
     // load the new component list and swap it with the current one...
     ComponentContainer newComponents;
-    if (!loadPackProfile(this, filename, patchesPattern(), newComponents)) {
+    if (auto result = loadPackProfile(this, filename, patchesPattern(), newComponents); !result) {
         qCritical() << d->m_instance->name() << "|" << "Failed to load the component config";
-        return false;
-    } else {
-        // FIXME: actually use fine-grained updates, not this...
-        beginResetModel();
-        // disconnect all the old components
-        for (auto component : d->components) {
-            disconnect(component.get(), &Component::dataChanged, this, &PackProfile::componentDataChanged);
-        }
-        d->components.clear();
-        d->componentIndex.clear();
-        for (auto component : newComponents) {
-            if (d->componentIndex.contains(component->m_uid)) {
-                qWarning() << d->m_instance->name() << "|" << "Ignoring duplicate component entry" << component->m_uid;
-                continue;
-            }
-            connect(component.get(), &Component::dataChanged, this, &PackProfile::componentDataChanged);
-            d->components.append(component);
-            d->componentIndex[component->m_uid] = component;
-        }
-        endResetModel();
-        d->loaded = true;
-        return true;
+        return result;
     }
+    // FIXME: actually use fine-grained updates, not this...
+    beginResetModel();
+    // disconnect all the old components
+    for (auto component : d->components) {
+        disconnect(component.get(), &Component::dataChanged, this, &PackProfile::componentDataChanged);
+    }
+    d->components.clear();
+    d->componentIndex.clear();
+    for (auto component : newComponents) {
+        if (d->componentIndex.contains(component->m_uid)) {
+            qWarning() << d->m_instance->name() << "|" << "Ignoring duplicate component entry" << component->m_uid;
+            continue;
+        }
+        connect(component.get(), &Component::dataChanged, this, &PackProfile::componentDataChanged);
+        d->components.append(component);
+        d->componentIndex[component->m_uid] = component;
+    }
+    endResetModel();
+    d->loaded = true;
+    return Result::Success();
 }
 
-void PackProfile::reload(Net::Mode netmode)
+PackProfile::Result PackProfile::reload(Net::Mode netmode)
 {
     // Do not reload when the update/resolve task is running. It is in control.
     if (d->m_updateTask) {
-        return;
+        return Result::Success();
     }
 
     // flush any scheduled saves to not lose state
@@ -336,9 +337,11 @@ void PackProfile::reload(Net::Mode netmode)
     // FIXME: differentiate when a reapply is required by propagating state from components
     invalidateLaunchProfile();
 
-    if (load()) {
-        resolve(netmode);
+    if (auto result = load(); !result) {
+        return result;
     }
+    resolve(netmode);
+    return Result::Success();
 }
 
 Task::Ptr PackProfile::getCurrentTask()
@@ -518,13 +521,9 @@ QVariant PackProfile::data(const QModelIndex& index, int role) const
 
     switch (role) {
         case Qt::CheckStateRole: {
-            switch (column) {
-                case NameColumn: {
-                    return patch->isEnabled() ? Qt::Checked : Qt::Unchecked;
-                }
-                default:
-                    return QVariant();
-            }
+            if (column == NameColumn)
+                return patch->isEnabled() ? Qt::Checked : Qt::Unchecked;
+            return QVariant();
         }
         case Qt::DisplayRole: {
             switch (column) {
@@ -650,11 +649,7 @@ void PackProfile::move(const int index, const MoveDirection direction)
         return;
     }
     beginMoveRows(QModelIndex(), index, index, QModelIndex(), togap);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
     d->components.swapItemsAt(index, theirIndex);
-#else
-    d->components.swap(index, theirIndex);
-#endif
     endMoveRows();
     invalidateLaunchProfile();
     scheduleSave();
@@ -753,7 +748,7 @@ bool PackProfile::removeComponent_internal(ComponentPtr patch)
     }
 
     // FIXME: we need a generic way of removing local resources, not just jar mods...
-    auto preRemoveJarMod = [&](LibraryPtr jarMod) -> bool {
+    auto preRemoveJarMod = [this](LibraryPtr jarMod) -> bool {
         if (!jarMod->isLocal()) {
             return true;
         }
@@ -892,25 +887,22 @@ bool PackProfile::installCustomJar_internal(QString filepath)
 
 std::optional<Manifest> getJarManifest(const QFileInfo& fileinfo)
 {
-    QuaZip zip(fileinfo.filePath());
-    if (!zip.open(QuaZip::mdUnzip)) {
-        return std::nullopt;
-    }
+    MMCZip::ArchiveReader reader{ fileinfo.absoluteFilePath() };
 
     std::optional<Manifest> manifest;
-    QuaZipFile file(&zip);
-    if (zip.setCurrentFile("META-INF/MANIFEST.MF") && file.open(QIODevice::ReadOnly)) {
+
+    const QString manifest_path{"META-INF/MANIFEST.MF"};
+    if (reader.collectFiles(true) && reader.exists(manifest_path)) {
+        const auto & manifest_file = reader.goToFile(manifest_path);
         try {
-            const auto& file_bytes = file.readAll();
+            const auto & file_bytes = manifest_file->readAll();
             std::string file_contents(file_bytes.constData(), file_bytes.size());
             std::istringstream iss{ file_contents };
             manifest = Manifest(iss, fileinfo.fileName().toStdString());
         } catch (std::exception& ex) {
             qDebug() << "Error parsing META/MANIFEST.MF inside " << fileinfo.path() << ":" << ex.what();
         }
-        file.close();
     }
-    zip.close();
     return manifest;
 }
 

@@ -43,7 +43,7 @@
 #include "FileSystem.h"
 #include "Json.h"
 
-QString BasicCatPack::path()
+QString BasicCatPack::path() const
 {
     const auto now = QDate::currentDate();
     const auto birthday = QDate(now.year(), 11, 2);
@@ -63,12 +63,12 @@ QString BasicCatPack::path()
 
 JsonCatPack::PartialDate partialDate(QJsonObject date)
 {
-    auto month = Json::ensureInteger(date, "month", 1);
+    auto month = date.contains("month") ? Json::requireInteger(date, "month") : 1;
     if (month > 12)
         month = 12;
     else if (month <= 0)
         month = 1;
-    auto day = Json::ensureInteger(date, "day", 1);
+    auto day = date.contains("day") ? Json::requireInteger(date, "day") : 1;
     if (day > 31)
         day = 31;
     else if (day <= 0)
@@ -83,9 +83,9 @@ JsonCatPack::JsonCatPack(QFileInfo& manifestInfo) : BasicCatPack(manifestInfo.di
     const auto root = doc.object();
     m_name = Json::requireString(root, "name", "Catpack name");
     m_default_path = FS::PathCombine(path, Json::requireString(root, "default", "Default Cat"));
-    auto variants = Json::ensureArray(root, "variants", QJsonArray(), "Catpack Variants");
+    auto variants = root.contains("variants") ? Json::requireArray(root, "variants", "Catpack Variants") : QJsonArray();
     for (auto v : variants) {
-        auto variant = Json::ensureObject(v, QJsonObject(), "Cat variant");
+        auto variant = Json::requireObject(v, "Cat variant");
         m_variants << Variant{ FS::PathCombine(path, Json::requireString(variant, "path", "Variant path")),
                                partialDate(Json::requireObject(variant, "startTime", "Variant startTime")),
                                partialDate(Json::requireObject(variant, "endTime", "Variant endTime")) };
@@ -100,12 +100,12 @@ QDate ensureDay(int year, int month, int day)
     return QDate(year, month, day);
 }
 
-QString JsonCatPack::path()
+QString JsonCatPack::path() const
 {
     return path(QDate::currentDate());
 }
 
-QString JsonCatPack::path(QDate now)
+QString JsonCatPack::path(QDate now) const
 {
     for (auto var : m_variants) {
         QDate startDate = ensureDay(now.year(), var.startTime.month, var.startTime.day);

@@ -44,7 +44,6 @@
       self,
       nixpkgs,
       libnbtplusplus,
-      nix-filter,
       ...
     }:
     let
@@ -59,14 +58,6 @@
       nixpkgsFor = forAllSystems (system: nixpkgs.legacyPackages.${system});
     in
     {
-      checks = forAllSystems (
-        system:
-        let
-          checks' = nixpkgsFor.${system}.callPackage ./nix/checks.nix { inherit self; };
-        in
-        lib.filterAttrs (_: lib.isDerivation) checks'
-      );
-
       devShells = forAllSystems (
         system:
         let
@@ -75,10 +66,7 @@
         {
           default = pkgs.mkShell {
             inputsFrom = [ self.packages.${system}.elysiumlauncher-unwrapped ];
-            buildInputs = with pkgs; [
-              ccache
-              ninja
-            ];
+            buildInputs = with pkgs; [ ninja ] ++ lib.optionals stdenv.hostPlatform.isLinux [ ccache ];
           };
         }
       );
@@ -89,7 +77,6 @@
         elysiumlauncher-unwrapped = prev.callPackage ./nix/unwrapped.nix {
           inherit
             libnbtplusplus
-            nix-filter
             self
             ;
         };
