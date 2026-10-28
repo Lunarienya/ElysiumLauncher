@@ -44,7 +44,6 @@
       self,
       nixpkgs,
       libnbtplusplus,
-      nix-filter,
       ...
     }:
     let
@@ -81,7 +80,6 @@
         elysiumlauncher-unwrapped = prev.callPackage ./nix/unwrapped.nix {
           inherit
             libnbtplusplus
-            nix-filter
             self
             ;
         };
